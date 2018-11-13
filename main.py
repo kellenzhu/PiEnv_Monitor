@@ -1,8 +1,7 @@
 # codeing = utf-8
 
 import Adafruit_DHT as dht
-import datetime
-import time
+from datetime import datetime
 from influxdb import InfluxDBClient
 
 
@@ -48,7 +47,7 @@ class Pi(object):
                 'tags': {
                     'location': 'TBI Shanghai DC',
                 },
-                'time': time.ctime(),
+                'time': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'fields': {
                     'temperature': data_dict['temperature'],
                     'humidity': data_dict['humidity']
@@ -62,5 +61,4 @@ class Pi(object):
 
 if __name__ == '__main__':
     run = Pi()
-    run.stdout_data()
     run.write_db()
