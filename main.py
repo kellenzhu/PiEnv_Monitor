@@ -1,8 +1,10 @@
 # codeing = utf-8
 
 import Adafruit_DHT as dht
+import time
 from datetime import datetime
 from influxdb import InfluxDBClient
+from db_parameter import LOGIN
 
 
 class Pi(object):
@@ -11,43 +13,36 @@ class Pi(object):
     PIN = 4
 
     @classmethod
-    def __get_data(cls):
+    def get_data(cls):
         humidity, temperature = dht.read_retry(cls.SENSER, cls.PIN)
         return {'temperature': temperature, 'humidity': humidity}
 
-    def alarm_count(self):
-        data_dict = self.__get_data()
+    @staticmethod
+    def alarm_count(data_dict):
         alarm_count = 0
         if data_dict['temperature'] >= 40 or data_dict['humidity'] >= 80:
             alarm_count = 1
 
         return alarm_count
 
-    def stdout_data(self):
-        data_dict = self.__get_data()
+    @staticmethod
+    def stdout_data(data_dict):
         print("Current Temperature is {0:0.1f}°, humidity is {1:0.1f}%"
               .format(data_dict['temperature'], data_dict['humidity']))
 
-    def write_db(self):
-        data_dict = self.__get_data()
-        login = {
-            'host': '10.60.1.230',
-            'port': 8086,
-            'username': 'influx',
-            'password': 'influx',
-            'db_name': 'sensor_data'
-        }
+    @staticmethod
+    def write_db(data_dict):
 
-        client = InfluxDBClient(login['host'], login['port'],
-                                login['username'], login['password'], login['db_name'])
-
+        time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        client = InfluxDBClient(LOGIN['host'], LOGIN['port'],
+                                LOGIN['username'], LOGIN['password'], LOGIN['db_name'])
         data = [
             {
                 'measurement': 'rpi-dht22',
                 'tags': {
                     'location': 'TBI Shanghai DC',
                 },
-                'time': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                'time': time,
                 'fields': {
                     'temperature': data_dict['temperature'],
                     'humidity': data_dict['humidity']
@@ -61,4 +56,12 @@ class Pi(object):
 
 if __name__ == '__main__':
     run = Pi()
-    run.write_db()
+    interval = 60
+    try:
+        while True:
+            data_res = run.get_data()
+            run.write_db(data_res)
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        exit(0)
+
