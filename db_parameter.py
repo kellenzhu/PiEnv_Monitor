@@ -1,7 +1,7 @@
 LOGIN = {
-            'host': '10.60.1.230',
+            'host': '',
             'port': 8086,
-            'username': 'influx',
-            'password': 'influx',
+            'username': '',
+            'password': '',
             'db_name': 'sensor_data'
         }

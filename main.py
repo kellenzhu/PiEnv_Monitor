@@ -66,7 +66,7 @@ if __name__ == '__main__':
         while True:
             data_res = run.get_data()
             run.write_db(data_res)
+            print(datetime.now())
             time.sleep(interval)
     except KeyboardInterrupt:
         exit(0)
-
