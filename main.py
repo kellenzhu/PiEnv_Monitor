@@ -40,7 +40,7 @@ class Pi(object):
         # client为连接InfluxDB的方法
         data = [
             {
-                'measurement': 'dht22-data',
+                'measurement': 'sensor_data',
                 # 表名为dht22-data
                 'tags': {
                     'location': 'Shanghai',
