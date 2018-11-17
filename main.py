@@ -25,14 +25,6 @@ class Pi(object):
         return {'temperature': temperature, 'humidity': humidity}
 
     @staticmethod
-    def alarm_count(data_dict):
-        alarm_count = 0
-        if data_dict['temperature'] >= 40 or data_dict['humidity'] >= 80:
-            alarm_count = 1
-
-        return alarm_count
-
-    @staticmethod
     def write_db(data_dict):
         """
         将温湿度参数以及时间戳数据写入InfluxDB中
@@ -40,7 +32,7 @@ class Pi(object):
         :return: 返回写入InfluxDB的结果
         """
 
-        time = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        localtime = time.ctime()
         # time为InfluxDB Table中的时间戳
 
         client = InfluxDBClient(LOGIN['host'], LOGIN['port'],
@@ -53,7 +45,7 @@ class Pi(object):
                 'tags': {
                     'location': 'Shanghai',
                 },
-                'time': time,
+                'time': localtime,
                 'fields': {
                     # fields为dht22-data表中的列参数，这里分别存放温度和湿度参数
                     'temperature': data_dict['temperature'],
